@@ -76,25 +76,29 @@ func (a *Auth) Login(
 	user, err := a.userProvider.User(ctx, email)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserNotFound) {
-			log.Warn("user not found", slog.String("error", err.Error()))
+			log.Warn("User not found", slog.String("error", err.Error()))
 			return "", fmt.Errorf("%s: %w", op, ErrInvalidCredential)
 		}
-		log.Error("failed to get user", slog.String("error", err.Error()))
+		log.Error("Failed to get user", slog.String("error", err.Error()))
 		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
 	if err := bcrypt.CompareHashAndPassword(user.PassHash, []byte(password)); err != nil {
-		log.Info("invalid password", slog.String("error", err.Error()))
-		return "", fmt.Errorf("%s: %w", op, ErrInvalidCredential)
+		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
+			log.Info("Invalid password", slog.String("error", err.Error()))
+			return "", fmt.Errorf("%s: %w", op, ErrInvalidCredential)
+		}
+		log.Error("Failed to match password", slog.String("error", err.Error()))
+		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
 	app, err := a.appProvider.App(ctx, appID)
 	if err != nil {
 		if errors.Is(err, storage.ErrAppNotFound) {
-			log.Warn("app not found", slog.String("error", err.Error()))
+			log.Warn("App not found", slog.String("error", err.Error()))
 			return "", fmt.Errorf("%s: %w", op, ErrInvalidAppId)
 		}
-		log.Warn("app not found", slog.String("error", err.Error()))
+		log.Error("Failed to found app", slog.String("error", err.Error()))
 		return "", fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -144,7 +148,7 @@ func (a *Auth) RegisterNewUser(
 	id, err := a.userSaver.SaveUser(ctx, email, passHash)
 	if err != nil {
 		if errors.Is(err, storage.ErrUserExists) {
-			log.Warn("user alredy exists", slog.String("error", err.Error()))
+			log.Warn("User alredy exists", slog.String("error", err.Error()))
 			return 0, fmt.Errorf("%s: %w", op, ErrUserAlreadyExists)
 		}
 		log.Error("Failed to save user", slog.String("error", err.Error()))
@@ -153,11 +157,13 @@ func (a *Auth) RegisterNewUser(
 
 	log.Info("User registered")
 
-	if err := a.mailProvider.Send(email, "empty"); err != nil {
-		log.Error("Failed to send email", slog.String("error", err.Error()))
-	}
-
-	log.Info("Email sent")
+	go func() {
+		if err := a.mailProvider.Send(email, "empty"); err != nil {
+			log.Error("Failed to send email", slog.String("error", err.Error()))
+		} else {
+			log.Info("Email sent successfully")
+		}
+	}()
 
 	return id, nil
 }

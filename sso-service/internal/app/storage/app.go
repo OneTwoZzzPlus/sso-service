@@ -1,7 +1,8 @@
 package storageapp
 
 import (
-	"diaryhub/sso-service/internal/storage/postgresql"
+	gorm "diaryhub/sso-service/internal/storage/gorm"
+	_ "diaryhub/sso-service/internal/storage/postgresql"
 	"fmt"
 
 	"log/slog"
@@ -10,7 +11,7 @@ import (
 type App struct {
 	log         *slog.Logger
 	storagePath string
-	Storage     *postgresql.Storage
+	Storage     *gorm.Storage
 }
 
 func MustConnect(logger *slog.Logger, storagePath string) *App {
@@ -26,7 +27,7 @@ func Connect(logger *slog.Logger, storagePath string) (*App, error) {
 	log := logger.With(slog.String("op", op))
 
 	log.Info("Connecting to storage...")
-	strg, err := postgresql.New(storagePath)
+	strg, err := gorm.New(storagePath)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
