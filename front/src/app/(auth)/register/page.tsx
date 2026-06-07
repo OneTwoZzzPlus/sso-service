@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 export default function Home() {
   const inputRef = useRef<HTMLInputElement>(null);
   const [result, setResult] = useState<string>("");
-
-  const handleRegister = () => {
+  
+  function handleRegister() {
     setResult("Загрузка...");
     const email = (document.getElementById("regEmail") as HTMLInputElement)?.value;
     const password = (document.getElementById("regPassword") as HTMLInputElement)?.value;
@@ -33,7 +33,7 @@ export default function Home() {
             throw new Error("внутренняя ошибка сервера");
           }
           throw new Error("ошибка сети");
-        } 
+        }
         return response.json();
       })
       .then((data) => {
@@ -42,7 +42,7 @@ export default function Home() {
       .catch((error) => {
         setResult("Ошибка: " + error.message);
       });
-  };
+  }
 
   return (
     <div className="block">

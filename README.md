@@ -1,11 +1,19 @@
-# DiaryHub
-Учебный проект
+# Сервис авторизации
+
+Учебный pet-проект на go и typescript next.js
+
+![Go](https://img.shields.io/badge/Go-00ADD8?style=for-the-badge&logo=go&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-black?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
+![gRPC](https://img.shields.io/badge/gRPC-244c5a?style=for-the-badge&logo=grpc&logoColor=white)
+![Next.js](https://img.shields.io/badge/Next.js-black?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 
 ## Запуск
 - Сборка и запуск `docker-compose up --build`
 - Запуск `docker compose up`
 
-## Микросервисы diaryhub
+## Микросервисы
 |     Имя     | Технология | Источник  | Описание |
 | ----------- | ---------- | --------- | -------- |
 | db          | PostgreSQL | DockerHub | Хранилище - реляционная база данных
